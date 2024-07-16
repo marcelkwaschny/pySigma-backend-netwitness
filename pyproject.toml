@@ -31,12 +31,15 @@ build-backend = "poetry.core.masonry.api"
 [tool.flake8]
 max-line-length = 120
 
+[tool.pylint.'MASTER']
+init-hook = "import sys; sys.path.append('.')"
+
 [tool.pylint.'FORMAT']
 max-line-length=120
 
 [tool.pylint.'MESSAGES CONTROL']
 enable="all"
-disable="too-few-public-methods,suppressed-message,locally-disabled,too-many-arguments"
+disable="too-few-public-methods,suppressed-message,locally-disabled,too-many-arguments,fixme,too-many-branches"
 
 [tool.black]
 line-length = 120
