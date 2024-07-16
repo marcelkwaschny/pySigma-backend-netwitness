@@ -1,7 +1,8 @@
 """Module for the pySigma NetWitness backend"""
 
 import re
-from typing import ClassVar, Dict, List, Optional, Pattern, Tuple, Union
+from collections import defaultdict
+from typing import ClassVar, Dict, Optional, Pattern, Tuple, Union
 
 from sigma.conditions import (
     ConditionAND,
@@ -288,16 +289,21 @@ class NetWitnessBackend(TextQueryBackend):
 
         return False
 
-    def convert_condition_as_in_expression(
-        self, cond: Union[ConditionOR, ConditionAND], state: ConversionState
-    ) -> Union[str, DeferredQueryExpression]:
-        """Conversion of field in value list conditions."""
+    def unpack_condition_if_necessary(self, cond: Union[ConditionOR, ConditionAND]) -> Union[ConditionOR, ConditionAND]:
+        """This method checks if a condition needs unpacking. If the condition contains arguments with values
+        that have the SigmaExpansion type unpacking is necessary for netwitness. This will convert the SigmaExpansion
+        value into normal ConditionFieldEqualsValueExpression which then can be used to turn into a list. Therefore
+        queries will get shorter.
 
-        if not self.field_in_list_expression:
-            raise SigmaConversionError("Value for 'field_in_list_expression' isn't set in the backend")
+        Args:
+            cond (Union[ConditionOR, ConditionAND]): Condition that should be unpacked if necessary
 
-        if not self.or_in_operator:
-            raise SigmaConversionError("Value for 'or_in_operator' isn't set in the backend")
+        Returns:
+            Union[ConditionOR, ConditionAND]: Updated condition or unchanged if not necessary
+        """
+
+        if isinstance(cond, ConditionAND):
+            return cond
 
         updated_condition: ConditionOR = ConditionOR(args=[])
 
@@ -309,36 +315,60 @@ class NetWitnessBackend(TextQueryBackend):
             else:
                 updated_condition.args.append(arg)
 
-        result: dict[str, List[Union[ConditionFieldEqualsValueExpression, ConditionValueExpression]]] = {}
+        return updated_condition
 
-        for arg in updated_condition.args:
+    def convert_or_expressions_into_sub_expressions(
+        self, cond: Union[ConditionOR, ConditionAND], state: ConversionState
+    ) -> list[Union[str, DeferredQueryExpression]]:
+        """Converts a condition into sub expressions. This is used to generate smaller expressions
+        for netwitness. Generally expressions like fieldA = 'foo' || fieldA = 'bar' can be summarized
+        as fieldA = 'foo','bar'. This also works for modifiers like contains, begins, ends e.g. but for
+        them the standard implementation of pySigma doesn't generates lists. So this is the implementation
+        for that. The implementation also supports multiple modifiers in the condition which will then
+        get seperatly summarized.
+
+        Args:
+            cond (Union[ConditionOR, ConditionAND]): Conditions that should be used for the conversion
+            state (ConversionState): Conversion state that is passed to sub methods
+
+        Raises:
+            SigmaConversionError: If field_in_list_expression is not set
+            SigmaConversionError: If or_in_operator is not set
+
+        Returns:
+            list[Union[str, DeferredQueryExpression]]: List of generated sub expressions
+        """
+
+        if not self.field_in_list_expression:
+            raise SigmaConversionError("Value for 'field_in_list_expression' isn't set in the backend")
+
+        if not self.or_in_operator:
+            raise SigmaConversionError("Value for 'or_in_operator' isn't set in the backend")
+
+        result: dict[str, list[Union[ConditionItem, ConditionFieldEqualsValueExpression, ConditionValueExpression]]] = (
+            defaultdict(list[Union[ConditionItem, ConditionFieldEqualsValueExpression, ConditionValueExpression]])
+        )
+
+        for arg in cond.args:
             if not isinstance(arg, (ConditionFieldEqualsValueExpression, ConditionValueExpression)):
                 continue
 
             if self.is_contains(arg):
-                if "contains" not in result:
-                    result["contains"] = []
                 result["contains"].append(arg)
             elif self.is_begins(arg):
-                if "begins" not in result:
-                    result["begins"] = []
                 result["begins"].append(arg)
             elif self.is_ends(arg):
-                if "ends" not in result:
-                    result["ends"] = []
                 result["ends"].append(arg)
             else:
-                if "or" not in result:
-                    result["or"] = []
                 result["or"].append(arg)
 
-        expressions: list[str | DeferredQueryExpression] = []
+        expressions: list[Union[str, DeferredQueryExpression]] = []
 
         for modifier, args in result.items():
             if not args:
                 continue
 
-            sub_expression: str | DeferredQueryExpression = super().convert_condition_as_in_expression(
+            sub_expression: Union[str, DeferredQueryExpression] = super().convert_condition_as_in_expression(
                 cond=ConditionOR(args=args), state=state
             )
 
@@ -347,4 +377,17 @@ class NetWitnessBackend(TextQueryBackend):
 
             expressions.append(sub_expression)
 
-        return f" {self.or_token} ".join(expressions)
+        return expressions
+
+    def convert_condition_as_in_expression(
+        self, cond: Union[ConditionOR, ConditionAND], state: ConversionState
+    ) -> Union[str, DeferredQueryExpression]:
+        """Conversion of field in value list conditions."""
+
+        cond = self.unpack_condition_if_necessary(cond)
+        sub_expressions = self.convert_or_expressions_into_sub_expressions(cond, state)
+
+        if sub_expressions and all(isinstance(entry, str) for entry in sub_expressions):
+            return f" {self.or_token} ".join(sub_expressions)
+
+        raise NotImplementedError("DeferredQueryExpression type is not implemented yet")
