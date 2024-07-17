@@ -1,20 +1,8 @@
 """Tests for the netwitness backend"""
 
-import pytest
 from sigma.collection import SigmaCollection
 
 from sigma.backends.netwitness import NetWitnessBackend
-
-
-@pytest.fixture(name="netwitness_backend")
-def netwitness_backend_fixture() -> NetWitnessBackend:
-    """Fixture for the netwitness backend instance
-
-    Returns:
-        NetWitnessBackend: NetWitness backend instance
-    """
-
-    return NetWitnessBackend()
 
 
 def test_netwitness_and_expression(netwitness_backend: NetWitnessBackend):

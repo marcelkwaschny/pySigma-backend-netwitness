@@ -7,3 +7,4 @@
 cov.xml
 dist/
 docs/_build
+test_rules
