@@ -27,7 +27,7 @@ jobs:
         run: poetry run pytest --cov=sigma --cov-report term --cov-report xml:cov.xml -vv
       - name: Store coverage for badge
         if: ${{ runner.os == 'Linux' }}
-        run: poetry run python print-coverage.py >> $GITHUB_ENV
+        run: poetry run python print_coverage.py >> $GITHUB_ENV
       - name: Create coverage badge
         if: ${{ github.repository == 'marcelkwaschny/pySigma-backend-netwitness' && github.event_name == 'push' && runner.os == 'Linux' }}
         uses: schneegans/dynamic-badges-action@v1.1.0
