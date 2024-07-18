@@ -1,5 +1,5 @@
 ![Tests](https://github.com/marcelkwaschny/pySigma-backend-netwitness/actions/workflows/test.yml/badge.svg)
-![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/marcelkwaschny/GitHub Gist identifier containing coverage badge JSON expected by shields.io./raw/marcelkwaschny-pySigma-backend-netwitness.json)
+![Coverage Badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/marcelkwaschny/67d1a922faf7921cada718e3677c5b51/raw/marcelkwaschny-pySigma-backend-netwitness.json)
 ![Status](https://img.shields.io/badge/Status-pre--release-orange)
 
 # pySigma NetWitness Backend

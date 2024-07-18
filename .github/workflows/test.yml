@@ -14,11 +14,11 @@ jobs:
         python-version: [ '3.9', '3.10', '3.11', '3.12' ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Poetry
         run: pipx install poetry
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -33,7 +33,7 @@ jobs:
         uses: schneegans/dynamic-badges-action@v1.1.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
-          gistID: GitHub Gist identifier containing coverage badge JSON expected by shields.io.
+          gistID: 67d1a922faf7921cada718e3677c5b51
           filename: marcelkwaschny-pySigma-backend-netwitness.json
           label: Coverage
           message: ${{ env.COVERAGE }}
