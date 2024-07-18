@@ -3,7 +3,6 @@ name = "pySigma-backend-netwitness"
 version = "0.1.0"
 description = "pySigma NetWitness backend"
 readme = "README.md"
-requires-python = ">=3.9"
 authors = ["Marcel Kwaschny <9392778+marcelkwaschny@users.noreply.github.com>"]
 license = "MIT"
 repository = "https://github.com/marcelkwaschny/pySigma-backend-netwitness"
