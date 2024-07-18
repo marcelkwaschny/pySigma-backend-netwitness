@@ -50,7 +50,7 @@ class NetWitnessBackend(TextQueryBackend):
     or_token: ClassVar[Optional[str]] = "||"
     and_token: ClassVar[Optional[str]] = "&&"
     not_token: ClassVar[Optional[str]] = "NOT"
-    eq_token: ClassVar[Optional[str]] = " = "  # Token inserted between field and value (without separator)
+    eq_token: ClassVar[Optional[str]] = " = "  # Token inserted between field and value
 
     # String output
     # Fields
@@ -192,6 +192,16 @@ class NetWitnessBackend(TextQueryBackend):
     def decide_convert_condition_as_in_expression(
         self, cond: Union[ConditionOR, ConditionAND], state: ConversionState
     ) -> bool:
+        """Decide if an OR or AND expression should be converted as "field in (value list)" or as plain expression.
+
+        Args:
+            cond (Union[ConditionOR, ConditionAND]): Condition that is converted for which the decision has to be made
+            state (ConversionState): Current conversion state
+
+        Returns:
+            bool: True if in-expression should be generated, else False
+        """
+
         if (
             not self.convert_or_as_in
             and isinstance(cond, ConditionOR)
@@ -373,7 +383,18 @@ class NetWitnessBackend(TextQueryBackend):
     def convert_condition_as_in_expression(
         self, cond: Union[ConditionOR, ConditionAND], state: ConversionState
     ) -> Union[str, DeferredQueryExpression]:
-        """Conversion of field in value list conditions."""
+        """Conversion of OR or AND conditions into "field in (value list)" expressions
+
+        Args:
+            cond (Union[ConditionOR, ConditionAND]): OR or AND condition
+            state (ConversionState): State of the conversion
+
+        Raises:
+            NotImplementedError: If a DeferredQueryExpression is used
+
+        Returns:
+            Union[str, DeferredQueryExpression]: Expression
+        """
 
         cond = self.unpack_condition_if_necessary(cond)
         sub_expressions = self.convert_or_expressions_into_sub_expressions(cond, state)

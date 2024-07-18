@@ -4,7 +4,7 @@ import pytest
 from sigma.collection import SigmaCollection
 
 from sigma.backends.netwitness import NetWitnessBackend
-from sigma.pipelines.netwitness.netwitness import netwitness_windows_pipeline
+from sigma.pipelines.netwitness.windows import netwitness_windows_pipeline
 
 
 @pytest.fixture(name="netwitness_backend_windows_pipeline")
