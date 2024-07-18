@@ -12,3 +12,5 @@ Further, it contains the following processing pipelines in `sigma.pipelines.netw
 This backend is currently maintained by:
 
 * [Marcel Kwaschny](https://github.com/marcelkwaschny/)
+* [Nik Stuckenbrock](https://github.com/nikstuckenbrock/)
+* [puQy](https://github.com/puQy/)
