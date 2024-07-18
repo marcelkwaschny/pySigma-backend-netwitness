@@ -39,7 +39,7 @@ max-line-length=120
 
 [tool.pylint.'MESSAGES CONTROL']
 enable="all"
-disable="too-few-public-methods,suppressed-message,locally-disabled,too-many-arguments,fixme"
+disable="too-few-public-methods,suppressed-message,locally-disabled,too-many-arguments,fixme,no-name-in-module"
 
 [tool.black]
 line-length = 120
