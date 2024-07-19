@@ -1,6 +1,6 @@
 """Prints code testing coverage as percentage for badge generation"""
 
-from defusedxml.ElementTree import parse
+from defusedxml.ElementTree import parse  # type: ignore
 
 tree = parse("cov.xml")
 root = tree.getroot()
