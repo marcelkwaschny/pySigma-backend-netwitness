@@ -4,7 +4,7 @@
 
 # pySigma NetWitness Backend
 
-This is the netwitness backend for pySigma. It provides the package `sigma.backends.netwitness` with the `NetWitnessBackend` class.
+This is the NetWitness backend for pySigma. It provides the package `sigma.backends.netwitness` with the `NetWitnessBackend` class.
 Further, it contains the following processing pipelines in `sigma.pipelines.netwitness`:
 
 * netwitness_windows_pipeline: NetWitness mapping and conversions for Windows
