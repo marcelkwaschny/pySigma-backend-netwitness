@@ -21,6 +21,11 @@ repos:
         entry: pflake8
         language: system
         types: [python]
+      - id: mypy
+        name: mypy
+        entry: mypy --explicit-package-bases 
+        language: system
+        types: [python]
       - id: pylint
         name: pylint
         entry: pylint

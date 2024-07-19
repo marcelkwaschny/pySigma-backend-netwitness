@@ -8,7 +8,6 @@ from sigma.conditions import (
     ConditionAND,
     ConditionFieldEqualsValueExpression,
     ConditionItem,
-    ConditionNOT,
     ConditionOR,
     ConditionValueExpression,
 )
@@ -39,7 +38,11 @@ class NetWitnessBackend(TextQueryBackend):
 
     # Operator precedence: tuple of Condition{AND,OR,NOT} in order of precedence.
     # The backend generates grouping if required
-    precedence: ClassVar[Tuple[ConditionItem, ConditionItem, ConditionItem]] = (ConditionNOT, ConditionAND, ConditionOR)
+    # precedence: ClassVar[Tuple[ConditionItem, ConditionItem, ConditionItem]] = (
+    #     ConditionNOT,
+    #     ConditionAND,
+    #     ConditionOR
+    # )
     group_expression: ClassVar[Optional[str]] = (
         "({expr})"  # Expression for precedence override grouping as format string with {expr} placeholder
     )
@@ -91,7 +94,7 @@ class NetWitnessBackend(TextQueryBackend):
     # token stored in the class variable re_flags.
     re_expression: ClassVar[Optional[str]] = "{field} regex '{regex}'"
     re_escape_char: ClassVar[Optional[str]] = "\\"  # Character used for escaping in regular expressions
-    re_escape: ClassVar[Tuple[str]] = ()  # List of strings that are escaped
+    # re_escape: ClassVar[Tuple[str]] = ()  # type: ignore # List of strings that are escaped
     re_escape_escape_char: bool = True  # If True, the escape character is also escaped
     # If True, the flags are prepended as (?x) group at the beginning of the regular expression, e.g. (?i).
     # If this is not supported by the target, it should be set to False.
@@ -400,6 +403,6 @@ class NetWitnessBackend(TextQueryBackend):
         sub_expressions = self.convert_or_expressions_into_sub_expressions(cond, state)
 
         if sub_expressions and all(isinstance(entry, str) for entry in sub_expressions):
-            return f" {self.or_token} ".join(sub_expressions)
+            return f" {self.or_token} ".join([entry for entry in sub_expressions if isinstance(entry, str)])
 
         raise NotImplementedError("DeferredQueryExpression type is not implemented yet")
