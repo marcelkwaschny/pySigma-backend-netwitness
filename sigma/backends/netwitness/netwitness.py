@@ -94,7 +94,6 @@ class NetWitnessBackend(TextQueryBackend):
     # token stored in the class variable re_flags.
     re_expression: ClassVar[Optional[str]] = "{field} regex '{regex}'"
     re_escape_char: ClassVar[Optional[str]] = "\\"  # Character used for escaping in regular expressions
-    # re_escape: ClassVar[Tuple[str]] = ()  # type: ignore # List of strings that are escaped
     re_escape_escape_char: bool = True  # If True, the escape character is also escaped
     # If True, the flags are prepended as (?x) group at the beginning of the regular expression, e.g. (?i).
     # If this is not supported by the target, it should be set to False.
