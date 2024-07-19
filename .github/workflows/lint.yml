@@ -1,0 +1,65 @@
+name: Lint
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+  workflow_dispatch:
+
+jobs:
+  pylint:
+    strategy:
+      matrix:
+        os: [ 'ubuntu-24.04' ]
+        python-version: [ '3.9', '3.10', '3.11', '3.12' ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: poetry install
+      - name: Run pylint
+        run: poetry run pylint sigma tests
+
+  flake8:
+    strategy:
+      matrix:
+        os: [ 'ubuntu-24.04' ]
+        python-version: [ '3.9', '3.10', '3.11', '3.12' ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: poetry install
+      - name: Run flake8
+        run: poetry run pflake8 sigma tests
+
+  ruff:
+    strategy:
+      matrix:
+        os: [ 'ubuntu-24.04' ]
+        python-version: [ '3.9', '3.10', '3.11', '3.12' ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: poetry install
+      - name: Run ruff
+        run: poetry run ruff check sigma tests
