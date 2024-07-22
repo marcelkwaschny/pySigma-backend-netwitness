@@ -46,7 +46,7 @@ from sigma.pipelines.netwitness.windows import netwitness_windows_pipeline
 
 netwitness_backend = NetWitnessBackend(processing_pipeline=netwitness_windows_pipeline())
 
-conversion_result: str = netwitness_backend.convert(
+conversion_result: list[str] = netwitness_backend.convert(
     SigmaCollection.from_yaml(
         """
         title: Test
