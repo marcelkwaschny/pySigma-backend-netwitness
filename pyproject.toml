@@ -1,9 +1,9 @@
 [tool.poetry]
 name = "pySigma-backend-netwitness"
-version = "0.1.0"
+version = "0.1.1"
 description = "pySigma NetWitness backend"
 readme = "README.md"
-authors = ["Marcel Kwaschny <9392778+marcelkwaschny@users.noreply.github.com>"]
+authors = ["Marcel Kwaschny <dev@marcelkwaschny.de>"]
 license = "LGPL-2.1-only"
 repository = "https://github.com/marcelkwaschny/pySigma-backend-netwitness"
 packages = [
