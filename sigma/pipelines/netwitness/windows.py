@@ -1,6 +1,6 @@
 """Module for pySigma NetWitness processing pipelines"""
 
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from sigma.pipelines.common import logsource_windows_process_creation
 from sigma.processing.conditions import IncludeFieldCondition, LogsourceCondition
@@ -11,7 +11,7 @@ from sigma.processing.transformations import (
     FieldMappingTransformation,
 )
 
-netwitness_windows_field_mappings: Dict[str, str | List[str]] = {
+netwitness_windows_field_mappings: Dict[str, Union[str, List[str]]] = {
     "Account": "user",
     "AgentComputer": "alias.host",
     "AllUser": "user.all",
