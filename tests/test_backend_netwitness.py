@@ -224,14 +224,17 @@ def test_netwitness_contains_modifier_with_list(netwitness_backend: NetWitnessBa
             detection:
                 sel:
                     fieldA|contains:
+                        # This is a comment
                         - foo
+                        # This is a comment
                         - bar
+                        - baz
                 condition: sel
             """
         )
     )
 
-    assert conversion_result == ["fieldA contains 'foo','bar'"]
+    assert conversion_result == ["fieldA contains 'foo','bar','baz'"]
 
 
 def test_netwitness_contains_all_modifier(netwitness_backend: NetWitnessBackend):
@@ -299,7 +302,7 @@ def test_netwitness_base64_offset_modifier(netwitness_backend: NetWitnessBackend
         )
     )
 
-    assert conversion_result == ["fieldA = 'Zm9v' || fieldA = 'Zvb' || fieldA = 'mb2'"]
+    assert conversion_result == ["fieldA = 'Zm9v','Zvb','mb2'"]
 
 
 def test_netwitness_base64_offset_modifier_with_contains_modifier(netwitness_backend: NetWitnessBackend):
@@ -471,6 +474,28 @@ def test_netwitness_windash_modifier(netwitness_backend: NetWitnessBackend):
                 product: test_product
             detection:
                 selection:
+                    fieldname|windash|contains: -f
+                condition: selection
+            """
+        )
+    )
+
+    assert conversion_result == ["fieldname contains '-f','/f','–f','—f','―f'"]
+
+
+def test_netwitness_windash_modifier_with_list(netwitness_backend: NetWitnessBackend):
+    """Test conversion of query with list values and windash modifier"""
+
+    conversion_result: str = netwitness_backend.convert(
+        SigmaCollection.from_yaml(  # type: ignore
+            """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                selection:
                     fieldname|windash|contains:
                         - " -param-name "
                         - " -f "
@@ -508,4 +533,58 @@ def test_netwitness_not_condition(netwitness_backend: NetWitnessBackend):
         )
     )
 
-    assert conversion_result == ["(fieldA = 'foo','bar') && (NOT fieldB = 'filter')"]
+    assert conversion_result == ["(fieldA = 'foo','bar') && (NOT (fieldB = 'filter'))"]
+
+
+def test_netwitness_not_condition_with_list_of_values(netwitness_backend: NetWitnessBackend):
+    """Test basic not condition with a list of values"""
+
+    conversion_result: str = netwitness_backend.convert(
+        SigmaCollection.from_yaml(  # type: ignore
+            """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                selection:
+                    fieldA:
+                        - "foo"
+                        - "bar"
+                filter:
+                    fieldB:
+                        - filter1
+                        - filter2
+                condition: selection and not filter
+            """
+        )
+    )
+
+    assert conversion_result == ["(fieldA = 'foo','bar') && (NOT (fieldB = 'filter1','filter2'))"]
+
+
+def test_netwitness_with_multiple_filters(netwitness_backend: NetWitnessBackend):
+    """Test conversion with multiple filters defined"""
+
+    conversion_result: str = netwitness_backend.convert(
+        SigmaCollection.from_yaml(  # type: ignore
+            """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                selection:
+                    FieldA|endswith: 'valueA'
+                filter_1:
+                    FieldB: null
+                filter_2:
+                    FieldB: ''
+                condition: selection and not 1 of filter*
+            """
+        )
+    )
+
+    assert conversion_result == ["FieldA ends 'valueA' && (NOT (FieldB !exists || FieldB = '-' || FieldB = ''))"]
