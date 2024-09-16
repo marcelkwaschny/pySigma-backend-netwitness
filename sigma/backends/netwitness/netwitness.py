@@ -2,12 +2,13 @@
 
 import re
 from collections import defaultdict
-from typing import ClassVar, Dict, Optional, Pattern, Tuple, Union
+from typing import Any, ClassVar, Dict, Optional, Pattern, Tuple, Union
 
 from sigma.conditions import (
     ConditionAND,
     ConditionFieldEqualsValueExpression,
     ConditionItem,
+    ConditionNOT,
     ConditionOR,
     ConditionValueExpression,
 )
@@ -147,15 +148,15 @@ class NetWitnessBackend(TextQueryBackend):
 
     # Null/None expressions
     # Expression for field has null value as format string with {field} placeholder for field name
-    field_null_expression: ClassVar[Optional[str]] = "{field} is null"
+    field_null_expression: ClassVar[Optional[str]] = "{field} !exists || {field} = '-'"
 
     # Field existence condition expressions.
-    field_exists_expression: ClassVar[Optional[str]] = (
-        "exists({field})"  # Expression for field existence as format string with {field} placeholder for field name
-    )
+    # Expression for field existence as format string with {field} placeholder for field name
+    field_exists_expression: ClassVar[Optional[str]] = "{field} exists"
+
     # Expression for field non-existence as format string with {field} placeholder for field name.
     # If not set, field_exists_expression is negated with boolean NOT.
-    field_not_exists_expression: ClassVar[Optional[str]] = "notexists({field})"
+    field_not_exists_expression: ClassVar[Optional[str]] = "{field} !exists"
 
     # Field value in list, e.g. "field in (value list)" or "field containsall (value list)"
     convert_or_as_in: ClassVar[bool] = True  # Convert OR as in-expression
@@ -190,6 +191,67 @@ class NetWitnessBackend(TextQueryBackend):
     deferred_only_query: ClassVar[Optional[str]] = (
         "*"  # String used as query if final query only contains deferred expression
     )
+
+    def convert_condition_not(self, cond: ConditionNOT, state: ConversionState) -> Union[str, DeferredQueryExpression]:
+        """Conversion of NOT conditions
+
+        Args:
+            cond (ConditionNOT): NOT Condition object that should be converted
+            state (ConversionState): State of the conversion
+
+        Raises:
+            NotImplementedError: If something isn't supported by the backend
+
+        Returns:
+            Union[str, DeferredQueryExpression]: Generated query
+        """
+
+        if self.not_token is None or self.group_expression is None:
+            raise NotImplementedError("Values for 'not_token' and 'group_expression' are needed to be set")
+
+        arg = cond.args[0]
+
+        try:
+            if arg.__class__ in self.precedence:  # group if AND or OR condition is negated
+                return self.not_token + self.token_separator + self.convert_condition_group(arg, state)  # type: ignore
+
+            expr = self.convert_condition(arg, state)  # type: ignore
+            if isinstance(expr, DeferredQueryExpression):  # negate deferred expression and pass it to parent
+                return expr.negate()
+
+            # convert negated expression to string
+            return self.not_token + self.token_separator + self.group_expression.format(expr=expr)
+        except TypeError as error:
+            raise NotImplementedError("Operator 'not' not supported by the backend") from error
+
+    def convert_condition_field_eq_expansion(
+        self, cond: ConditionFieldEqualsValueExpression, state: ConversionState
+    ) -> Any:
+        """Converting expansion conditions like windash, contains, base64 e.g.
+
+        Args:
+            cond (ConditionFieldEqualsValueExpression): Condition that should be converted
+            state (ConversionState): State of the conversion
+
+        Raises:
+            ValueError: If the method will be called with a condition that isn't a 'SigmaExpansion'
+
+        Returns:
+            Any: Query as string or DeferredQueryExpression
+        """
+
+        if not isinstance(cond.value, SigmaExpansion):
+            raise ValueError("Only conditions with SigmaExpansion values are allowed for this method")
+
+        or_cond = ConditionOR(
+            [ConditionFieldEqualsValueExpression(cond.field, value) for value in cond.value.values],
+            cond.source,
+        )
+
+        if self.decide_convert_condition_as_in_expression(or_cond, state):
+            return self.convert_condition_as_in_expression(or_cond, state)
+
+        return self.convert_condition_or(or_cond, state)
 
     def decide_convert_condition_as_in_expression(
         self, cond: Union[ConditionOR, ConditionAND], state: ConversionState
