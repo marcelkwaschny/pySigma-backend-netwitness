@@ -209,6 +209,9 @@ class NetWitnessBackend(TextQueryBackend):
         if self.not_token is None or self.group_expression is None:
             raise NotImplementedError("Values for 'not_token' and 'group_expression' are needed to be set")
 
+        if not cond.args:
+            raise ValueError("Given condition contains no arguments")
+
         arg = cond.args[0]
 
         try:
@@ -222,7 +225,7 @@ class NetWitnessBackend(TextQueryBackend):
             # convert negated expression to string
             return self.not_token + self.token_separator + self.group_expression.format(expr=expr)
         except TypeError as error:
-            raise NotImplementedError("Operator 'not' not supported by the backend") from error
+            raise NotImplementedError("Operator 'not' isn't supported by the backend") from error
 
     def convert_condition_field_eq_expansion(
         self, cond: ConditionFieldEqualsValueExpression, state: ConversionState
