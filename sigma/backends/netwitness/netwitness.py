@@ -151,15 +151,15 @@ class NetWitnessBackend(TextQueryBackend):
 
     # Null/None expressions
     # Expression for field has null value as format string with {field} placeholder for field name
-    field_null_expression: ClassVar[Optional[str]] = "{field} {not_exists_token} || {field} = '-'"
+    field_null_expression: ClassVar[Optional[str]] = f"{{field}} {not_exists_token} || {{field}} = '-'"
 
     # Field existence condition expressions.
     # Expression for field existence as format string with {field} placeholder for field name
-    field_exists_expression: ClassVar[Optional[str]] = "{field} {exists_token}"
+    field_exists_expression: ClassVar[Optional[str]] = f"{{field}} {exists_token}"
 
     # Expression for field non-existence as format string with {field} placeholder for field name.
     # If not set, field_exists_expression is negated with boolean NOT.
-    field_not_exists_expression: ClassVar[Optional[str]] = "{field} {not_exists_token}"
+    field_not_exists_expression: ClassVar[Optional[str]] = f"{{field}} {not_exists_token}"
 
     # Field value in list, e.g. "field in (value list)" or "field containsall (value list)"
     convert_or_as_in: ClassVar[bool] = True  # Convert OR as in-expression

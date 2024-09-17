@@ -588,3 +588,47 @@ def test_netwitness_with_multiple_filters(netwitness_backend: NetWitnessBackend)
     )
 
     assert conversion_result == ["FieldA ends 'valueA' && (NOT (FieldB !exists || FieldB = '-' || FieldB = ''))"]
+
+
+def test_netwitness_exists_modifier(netwitness_backend: NetWitnessBackend):
+    """Test conversion with the exists modifier set to true"""
+
+    conversion_result: str = netwitness_backend.convert(
+        SigmaCollection.from_yaml(  # type: ignore
+            """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                selection:
+                    FieldA|exists: true
+                condition: selection
+            """
+        )
+    )
+
+    assert conversion_result == ["FieldA exists"]
+
+
+def test_netwitness_not_exists_modifier(netwitness_backend: NetWitnessBackend):
+    """Test conversion with the exists modifier set to false"""
+
+    conversion_result: str = netwitness_backend.convert(
+        SigmaCollection.from_yaml(  # type: ignore
+            """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                selection:
+                    FieldA|exists: false
+                condition: selection
+            """
+        )
+    )
+
+    assert conversion_result == ["FieldA !exists"]
