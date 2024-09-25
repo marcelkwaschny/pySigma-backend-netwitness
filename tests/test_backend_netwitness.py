@@ -632,3 +632,27 @@ def test_netwitness_not_exists_modifier(netwitness_backend: NetWitnessBackend):
     )
 
     assert conversion_result == ["FieldA !exists"]
+
+
+def test_equal_char_in_list_contains(netwitness_backend: NetWitnessBackend):
+    """Test conversion with the exists modifier set to false"""
+
+    conversion_result: str = netwitness_backend.convert(
+        SigmaCollection.from_yaml(
+            """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                selection:
+                    FieldA|contains:
+                        - field1=value1
+                        - field2=value2
+                condition: selection
+            """
+        )
+    )
+
+    assert conversion_result == ["FieldA contains 'field1=value1','field2=value2'"]
