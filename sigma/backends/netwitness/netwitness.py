@@ -439,12 +439,16 @@ class NetWitnessBackend(TextQueryBackend):
             if not args:
                 continue
 
+            if modifier not in ["or"]:
+                saved_or_in_operator = self.or_in_operator
+                NetWitnessBackend.or_in_operator = modifier
+
             sub_expression: Union[str, DeferredQueryExpression] = super().convert_condition_as_in_expression(
                 cond=ConditionOR(args=args), state=state
             )
 
-            if isinstance(sub_expression, str) and modifier not in ["or"]:
-                sub_expression = sub_expression.replace(self.or_in_operator, modifier)
+            if modifier not in ["or"]:
+                NetWitnessBackend.or_in_operator = saved_or_in_operator
 
             expressions.append(sub_expression)
 
