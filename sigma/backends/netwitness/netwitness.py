@@ -439,7 +439,7 @@ class NetWitnessBackend(TextQueryBackend):
             if not args:
                 continue
 
-            if modifier not in ["or"]:
+            if modifier != "or":
                 saved_or_in_operator = self.or_in_operator
                 NetWitnessBackend.or_in_operator = modifier
 
@@ -447,7 +447,7 @@ class NetWitnessBackend(TextQueryBackend):
                 cond=ConditionOR(args=args), state=state
             )
 
-            if modifier not in ["or"]:
+            if modifier != "or":
                 NetWitnessBackend.or_in_operator = saved_or_in_operator
 
             expressions.append(sub_expression)
