@@ -1,4 +1,4 @@
-"""Module to test NetWitness processing pipelines"""
+"""Module to test the netwitness windows processing pipeline"""
 
 import pytest
 from sigma.collection import SigmaCollection
