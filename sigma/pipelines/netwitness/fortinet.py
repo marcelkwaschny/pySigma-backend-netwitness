@@ -10,6 +10,8 @@ from sigma.processing.transformations import (
     FieldMappingTransformation,
 )
 
+from sigma.backends.netwitness.transformations import UnquoteStringTransformation
+
 netwitness_fortinet_field_mappings: Dict[str, Union[str, List[str]]] = {
     "DestinationPort": "ip.dstport",
     "NetwitnessDirection": "direction",
@@ -82,11 +84,15 @@ field_transformations_to_string: List[str] = [
 
 field_transformations_to_number: List[str] = [
     "DestinationPort",
+    "attackid",
     "dst_port",
     "dstport",
+    "sentbyte",
     "src_port",
     "srcport",
 ]
+
+field_transformations_unquote: List[str] = ["client_ip", "dst_ip", "dstip", "remip", "srcip"]
 
 logsource_transformation_mappings: List[Tuple[str, LogsourceCondition, Dict]] = [
     ("fortimail", LogsourceCondition(product="fortimail"), {"device.type": "fortinetfortimail"}),
@@ -144,6 +150,15 @@ def netwitness_fortinet_pipeline() -> ProcessingPipeline:
             identifier="netwitness_fortinet_transform_fields_to_number",
             transformation=ConvertTypeTransformation(target_type="num"),
             field_name_conditions=[IncludeFieldCondition(fields=field_transformations_to_number)],
+            rule_conditions=[LogsourceCondition(product="fortinet")],
+        )
+    )
+
+    processing_items.append(
+        ProcessingItem(
+            identifier="netwitness_fortinet_transform_unquote_fields",
+            transformation=UnquoteStringTransformation(),
+            field_name_conditions=[IncludeFieldCondition(fields=field_transformations_unquote)],
             rule_conditions=[LogsourceCondition(product="fortinet")],
         )
     )

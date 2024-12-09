@@ -1,8 +1,7 @@
 """Module for the pySigma NetWitness backend"""
 
-import re
 from collections import defaultdict
-from typing import Any, ClassVar, Dict, Optional, Pattern, Tuple, Union
+from typing import Any, ClassVar, Dict, Optional, Pattern, Tuple, Type, Union
 
 from sigma.conditions import (
     ConditionAND,
@@ -25,6 +24,8 @@ from sigma.types import (
     SpecialChars,
 )
 
+from sigma.backends.netwitness.types import SigmaNetWitnessString
+
 
 class NetWitnessBackend(TextQueryBackend):
     """NetWitness backend."""
@@ -33,17 +34,17 @@ class NetWitnessBackend(TextQueryBackend):
     formats: ClassVar[Dict[str, str]] = {
         "default": "Plain netwitness queries",
     }
-    # TODO: does the backend requires that a processing pipeline is provided? This information can be used by user
+    # Does the backend requires that a processing pipeline is provided? This information can be used by user
     # interface programs like Sigma CLI to warn users about inappropriate usage of the backend.
     requires_pipeline: ClassVar[bool] = False
 
     # Operator precedence: tuple of Condition{AND,OR,NOT} in order of precedence.
     # The backend generates grouping if required
-    # precedence: ClassVar[Tuple[ConditionItem, ConditionItem, ConditionItem]] = (
-    #     ConditionNOT,
-    #     ConditionAND,
-    #     ConditionOR
-    # )
+    precedence: ClassVar[Tuple[Type[ConditionItem], Type[ConditionItem], Type[ConditionItem]]] = (
+        ConditionNOT,
+        ConditionAND,
+        ConditionOR,
+    )
     group_expression: ClassVar[Optional[str]] = (
         "({expr})"  # Expression for precedence override grouping as format string with {expr} placeholder
     )
@@ -65,16 +66,18 @@ class NetWitnessBackend(TextQueryBackend):
     field_quote: ClassVar[Optional[str]] = None
     # Quote field names if this pattern (doesn't) matches, depending on field_quote_pattern_negation.
     # Field name is always quoted if pattern is not set.
-    field_quote_pattern: ClassVar[Optional[Pattern[str]]] = re.compile("^\\w+$")
+    field_quote_pattern: ClassVar[Optional[Pattern[str]]] = None
     # Negate field_quote_pattern result. Field name is quoted if pattern doesn't matches if set to True (default).
     field_quote_pattern_negation: ClassVar[bool] = True
 
     # Values
     str_quote: ClassVar[str] = "'"  # string quoting character (added as escaping character)
+    str_quote_pattern: ClassVar[Optional[Pattern[str]]] = None  # re.compile("^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
+    str_quote_pattern_negation: ClassVar[bool] = True
     escape_char: ClassVar[Optional[str]] = "\\"  # Escaping character for special characrers inside string
     wildcard_multi: ClassVar[Optional[str]] = ""  # Character used as multi-character wildcard
     wildcard_single: ClassVar[Optional[str]] = ""  # Character used as single-character wildcard
-    # add_escaped: ClassVar[str] = "\\"  # Characters quoted in addition to wildcards and string quote
+    add_escaped: ClassVar[str] = ""  # Characters quoted in addition to wildcards and string quote
     filter_chars: ClassVar[str] = ""  # Characters filtered
     bool_values: ClassVar[Dict[bool, Optional[str]]] = {  # Values to which boolean values are mapped.
         True: "true",
@@ -194,6 +197,12 @@ class NetWitnessBackend(TextQueryBackend):
     deferred_only_query: ClassVar[Optional[str]] = (
         "*"  # String used as query if final query only contains deferred expression
     )
+
+    def decide_string_quoting(self, s: Union[SigmaString, SigmaNetWitnessString]) -> bool:
+        if isinstance(s, SigmaNetWitnessString):
+            return s.quote
+
+        return super().decide_string_quoting(s)
 
     def convert_condition_not(self, cond: ConditionNOT, state: ConversionState) -> Union[str, DeferredQueryExpression]:
         """Conversion of NOT conditions
