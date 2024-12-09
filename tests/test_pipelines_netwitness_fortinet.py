@@ -19,7 +19,7 @@ def netwitness_backend_fortinet_pipeline_fixture() -> NetWitnessBackend:
 
 
 def test_fortinet_adding_fortinet_device_type_transformation(netwitness_backend_fortinet_pipeline: NetWitnessBackend):
-    """Test"""
+    """Test if the logsource product 'fortinet' will be transformed to the correct device type"""
 
     conversion_result: str = netwitness_backend_fortinet_pipeline.convert(
         SigmaCollection.from_yaml(  # type: ignore
@@ -42,7 +42,7 @@ def test_fortinet_adding_fortinet_device_type_transformation(netwitness_backend_
 
 
 def test_fortinet_adding_fortimail_device_type_transformation(netwitness_backend_fortinet_pipeline: NetWitnessBackend):
-    """Test"""
+    """Test if the logsource product 'fortimail' will be transformed to the correct device type"""
 
     conversion_result: str = netwitness_backend_fortinet_pipeline.convert(
         SigmaCollection.from_yaml(  # type: ignore
@@ -62,4 +62,30 @@ def test_fortinet_adding_fortimail_device_type_transformation(netwitness_backend
 
     assert conversion_result == [
         "device.type = 'fortinetfortimail' && (direction = 'out' && classifier = 'Virus Signature')"
+    ]
+
+
+def test_fortinet_category_mapping_and_integer_conversion(netwitness_backend_fortinet_pipeline: NetWitnessBackend):
+    """Test if the logsource product 'fortimail' will be transformed to the correct device type"""
+
+    conversion_result: str = netwitness_backend_fortinet_pipeline.convert(
+        SigmaCollection.from_yaml(  # type: ignore
+            """
+            title: Test
+            status: test
+            logsource:
+                product: fortinet
+                service: ips
+            detection:
+                selection:
+                    dstip: 127.0.0.1
+                    dstport: 1337
+                condition: selection
+            """
+        )
+    )
+
+    assert conversion_result == [
+        "category = 'ips' && (device.type = 'fortinet' && (ip.dst = 127.0.0.1 && ip.dstport = 1337))"
+        # "category = 'ips' && (device.type = 'fortinet' && (ip.dst = '10.105.1.41' && ip.dstport = 515))"
     ]

@@ -11,6 +11,8 @@ from sigma.processing.transformations import (
     FieldMappingTransformation,
 )
 
+from sigma.backends.netwitness.transformations import UnquoteStringTransformation
+
 netwitness_windows_field_mappings: Dict[str, Union[str, List[str]]] = {
     "Account": "user",
     "AgentComputer": "alias.host",
@@ -47,6 +49,13 @@ field_transformations_to_number: List[str] = [
     "IpPort",
 ]
 
+field_transformations_unquote: List[str] = [
+    "DestinationIp",
+    "DestinationIpAddress",
+    "IpAddress",
+    "SourceIp",
+]
+
 
 def netwitness_windows_pipeline() -> ProcessingPipeline:
     """Returns the netwitness <-> windows process pipeline
@@ -80,6 +89,15 @@ def netwitness_windows_pipeline() -> ProcessingPipeline:
             transformation=ConvertTypeTransformation(target_type="num"),
             field_name_conditions=[IncludeFieldCondition(fields=field_transformations_to_number)],
             rule_conditions=[LogsourceCondition(product="windows")],
+        )
+    )
+
+    processing_items.append(
+        ProcessingItem(
+            identifier="netwitness_fortinet_transform_unquote_fields",
+            transformation=UnquoteStringTransformation(),
+            field_name_conditions=[IncludeFieldCondition(fields=field_transformations_unquote)],
+            rule_conditions=[LogsourceCondition(product="fortinet")],
         )
     )
 
