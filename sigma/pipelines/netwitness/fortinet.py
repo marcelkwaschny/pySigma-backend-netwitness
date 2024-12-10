@@ -2,15 +2,9 @@
 
 from typing import Dict, List, Tuple, Union
 
-from sigma.processing.conditions import IncludeFieldCondition, LogsourceCondition
+from sigma.processing.conditions import LogsourceCondition
 from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
-from sigma.processing.transformations import (
-    AddConditionTransformation,
-    ConvertTypeTransformation,
-    FieldMappingTransformation,
-)
-
-from sigma.backends.netwitness.transformations import UnquoteStringTransformation
+from sigma.processing.transformations import AddConditionTransformation, FieldMappingTransformation
 
 netwitness_fortinet_field_mappings: Dict[str, Union[str, List[str]]] = {
     "DestinationPort": "ip.dstport",
@@ -22,17 +16,11 @@ netwitness_fortinet_field_mappings: Dict[str, Union[str, List[str]]] = {
     "attack": "policy.name",
     "attackid": "sig.id",
     "catdesc": "filter",
-    "classifier": "filter",
-    "client_ip": "ip.src",
     "crlevel": "severity",
-    "device_id": "hardware.id",
     "devid": "hardware.id",
     "devname": "event.source",
     "direction": "attack.direction",
-    "disposition": "disposition",
-    "domain": "domain",
     "dst_int": "dinterface",
-    "dst_ip": "ip.dst",
     "dst_port": "ip.dstport",
     "dstcountry": "country.dst",
     "dstintf": "dinterface",
@@ -41,19 +29,16 @@ netwitness_fortinet_field_mappings: Dict[str, Union[str, List[str]]] = {
     "dstport": "ip.dstport",
     "eventtype": "category",
     "filename": "filename",
-    "from": "email.src",
     "group": "group",
     "hostname": "alias.host",
     "level": "severity",
     "logid": "reference.id",
-    "mailer": "client",
     "msg": "event.desc",
     "poluuid": "reference.id2",
     "pri": "severity",
     "profile": "rule.name",
     "qname": "web.domain",
     "remip": "ip.dst",
-    "resolved": "context",
     "sentbyte": "bytes.src",
     "severity": "severity",
     "src_int": "sinterface",
@@ -65,37 +50,16 @@ netwitness_fortinet_field_mappings: Dict[str, Union[str, List[str]]] = {
     "srcname": "host.src",
     "srcport": "ip.srcport",
     "status": "event.state",
-    "subject": "subject",
     "subtype": "category",
-    "to": "email.dst",
     "trandisp": "context",
     "type": "event.type",
-    "ui": "user.dst",
     "user": "user.dst",
     "utmaction": "event.state",
     "vd": "vsys",
     "virus": "virusname",
 }
 
-field_transformations_to_string: List[str] = [
-    "logid",
-    "poluuid",
-]
-
-field_transformations_to_number: List[str] = [
-    "DestinationPort",
-    "attackid",
-    "dst_port",
-    "dstport",
-    "sentbyte",
-    "src_port",
-    "srcport",
-]
-
-field_transformations_unquote: List[str] = ["client_ip", "dst_ip", "dstip", "remip", "srcip"]
-
 logsource_transformation_mappings: List[Tuple[str, LogsourceCondition, Dict]] = [
-    ("fortimail", LogsourceCondition(product="fortimail"), {"device.type": "fortinetfortimail"}),
     ("fortinet", LogsourceCondition(product="fortinet"), {"device.type": "fortinet"}),
     ("fortinet_firewall", LogsourceCondition(product="fortinet", service="firewall"), {"category": "forward"}),
     ("fortinet_user", LogsourceCondition(product="fortinet", service="user"), {"category": "user"}),
@@ -138,33 +102,6 @@ def netwitness_fortinet_pipeline() -> ProcessingPipeline:
 
     processing_items.append(
         ProcessingItem(
-            identifier="netwitness_fortinet_transform_fields_to_string",
-            transformation=ConvertTypeTransformation(target_type="str"),
-            field_name_conditions=[IncludeFieldCondition(fields=field_transformations_to_string)],
-            rule_conditions=[LogsourceCondition(product="fortinet")],
-        )
-    )
-
-    processing_items.append(
-        ProcessingItem(
-            identifier="netwitness_fortinet_transform_fields_to_number",
-            transformation=ConvertTypeTransformation(target_type="num"),
-            field_name_conditions=[IncludeFieldCondition(fields=field_transformations_to_number)],
-            rule_conditions=[LogsourceCondition(product="fortinet")],
-        )
-    )
-
-    processing_items.append(
-        ProcessingItem(
-            identifier="netwitness_fortinet_transform_unquote_fields",
-            transformation=UnquoteStringTransformation(),
-            field_name_conditions=[IncludeFieldCondition(fields=field_transformations_unquote)],
-            rule_conditions=[LogsourceCondition(product="fortinet")],
-        )
-    )
-
-    processing_items.append(
-        ProcessingItem(
             identifier="netwitness_fortinet_field_mapping",
             transformation=FieldMappingTransformation(netwitness_fortinet_field_mappings),
             rule_conditions=[LogsourceCondition(product="fortinet")],
@@ -174,6 +111,6 @@ def netwitness_fortinet_pipeline() -> ProcessingPipeline:
     return ProcessingPipeline(
         name="NetWitness Fortinet log source conditions",
         allowed_backends=frozenset({"netwitness"}),
-        priority=20,
+        priority=2,
         items=processing_items,
     )

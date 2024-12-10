@@ -3,15 +3,9 @@
 from typing import Dict, List, Union
 
 from sigma.pipelines.common import logsource_windows_process_creation
-from sigma.processing.conditions import IncludeFieldCondition, LogsourceCondition
+from sigma.processing.conditions import LogsourceCondition
 from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
-from sigma.processing.transformations import (
-    AddConditionTransformation,
-    ConvertTypeTransformation,
-    FieldMappingTransformation,
-)
-
-from sigma.backends.netwitness.transformations import UnquoteStringTransformation
+from sigma.processing.transformations import AddConditionTransformation, FieldMappingTransformation
 
 netwitness_windows_field_mappings: Dict[str, Union[str, List[str]]] = {
     "Account": "user",
@@ -37,25 +31,6 @@ netwitness_windows_field_mappings: Dict[str, Union[str, List[str]]] = {
     "TargetUserName": "user.dst",
 }
 
-field_transformations_to_string: List[str] = [
-    "EventID",
-    "LogonType",
-]
-
-field_transformations_to_number: List[str] = [
-    "DestinationIpPort",
-    "DestinationPort",
-    "DestPort",
-    "IpPort",
-]
-
-field_transformations_unquote: List[str] = [
-    "DestinationIp",
-    "DestinationIpAddress",
-    "IpAddress",
-    "SourceIp",
-]
-
 
 def netwitness_windows_pipeline() -> ProcessingPipeline:
     """Returns the netwitness <-> windows process pipeline
@@ -76,33 +51,6 @@ def netwitness_windows_pipeline() -> ProcessingPipeline:
 
     processing_items.append(
         ProcessingItem(
-            identifier="netwitness_windows_transform_fields_to_string",
-            transformation=ConvertTypeTransformation(target_type="str"),
-            field_name_conditions=[IncludeFieldCondition(fields=field_transformations_to_string)],
-            rule_conditions=[LogsourceCondition(product="windows")],
-        )
-    )
-
-    processing_items.append(
-        ProcessingItem(
-            identifier="netwitness_windows_transform_fields_to_number",
-            transformation=ConvertTypeTransformation(target_type="num"),
-            field_name_conditions=[IncludeFieldCondition(fields=field_transformations_to_number)],
-            rule_conditions=[LogsourceCondition(product="windows")],
-        )
-    )
-
-    processing_items.append(
-        ProcessingItem(
-            identifier="netwitness_fortinet_transform_unquote_fields",
-            transformation=UnquoteStringTransformation(),
-            field_name_conditions=[IncludeFieldCondition(fields=field_transformations_unquote)],
-            rule_conditions=[LogsourceCondition(product="fortinet")],
-        )
-    )
-
-    processing_items.append(
-        ProcessingItem(
             identifier="netwitness_windows_field_mapping",
             transformation=FieldMappingTransformation(netwitness_windows_field_mappings),
             rule_conditions=[LogsourceCondition(product="windows")],
@@ -112,6 +60,6 @@ def netwitness_windows_pipeline() -> ProcessingPipeline:
     return ProcessingPipeline(
         name="NetWitness Windows log source conditions",
         allowed_backends=frozenset({"netwitness"}),
-        priority=20,
+        priority=1,
         items=processing_items,
     )
