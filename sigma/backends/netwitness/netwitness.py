@@ -15,6 +15,7 @@ from sigma.conversion.base import TextQueryBackend
 from sigma.conversion.deferred import DeferredQueryExpression
 from sigma.conversion.state import ConversionState
 from sigma.exceptions import SigmaConversionError
+from sigma.processing.pipeline import ProcessingPipeline
 from sigma.types import (
     SigmaCompareExpression,
     SigmaExpansion,
@@ -25,6 +26,7 @@ from sigma.types import (
 )
 
 from sigma.backends.netwitness.types import SigmaNetWitnessString
+from sigma.pipelines.netwitness.netwitness import netwitness_pipeline
 
 
 class NetWitnessBackend(TextQueryBackend):
@@ -37,6 +39,8 @@ class NetWitnessBackend(TextQueryBackend):
     # Does the backend requires that a processing pipeline is provided? This information can be used by user
     # interface programs like Sigma CLI to warn users about inappropriate usage of the backend.
     requires_pipeline: ClassVar[bool] = False
+    default_format: ClassVar[str] = "default"
+    output_format_processing_pipeline: ClassVar[Dict[str, ProcessingPipeline]] = {"default": netwitness_pipeline()}
 
     # Operator precedence: tuple of Condition{AND,OR,NOT} in order of precedence.
     # The backend generates grouping if required

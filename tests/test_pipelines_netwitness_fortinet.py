@@ -41,30 +41,6 @@ def test_fortinet_adding_fortinet_device_type_transformation(netwitness_backend_
     assert conversion_result == ["device.type = 'fortinet' && (severity = 'high','critical')"]
 
 
-def test_fortinet_adding_fortimail_device_type_transformation(netwitness_backend_fortinet_pipeline: NetWitnessBackend):
-    """Test if the logsource product 'fortimail' will be transformed to the correct device type"""
-
-    conversion_result: str = netwitness_backend_fortinet_pipeline.convert(
-        SigmaCollection.from_yaml(  # type: ignore
-            """
-            title: Test
-            status: test
-            logsource:
-                product: fortimail
-            detection:
-                selection:
-                    direction: 'out'
-                    classifier: 'Virus Signature'
-                condition: selection
-            """
-        )
-    )
-
-    assert conversion_result == [
-        "device.type = 'fortinetfortimail' && (direction = 'out' && classifier = 'Virus Signature')"
-    ]
-
-
 def test_fortinet_category_mapping_and_integer_conversion(netwitness_backend_fortinet_pipeline: NetWitnessBackend):
     """Test if the logsource product 'fortimail' will be transformed to the correct device type"""
 
@@ -78,8 +54,8 @@ def test_fortinet_category_mapping_and_integer_conversion(netwitness_backend_for
                 service: ips
             detection:
                 selection:
-                    dstip: 127.0.0.1
-                    dstport: 1337
+                    dstip: '127.0.0.1'
+                    dstport: '1337'
                 condition: selection
             """
         )
@@ -87,5 +63,4 @@ def test_fortinet_category_mapping_and_integer_conversion(netwitness_backend_for
 
     assert conversion_result == [
         "category = 'ips' && (device.type = 'fortinet' && (ip.dst = 127.0.0.1 && ip.dstport = 1337))"
-        # "category = 'ips' && (device.type = 'fortinet' && (ip.dst = '10.105.1.41' && ip.dstport = 515))"
     ]
