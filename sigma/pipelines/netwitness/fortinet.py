@@ -6,6 +6,8 @@ from sigma.processing.conditions import LogsourceCondition
 from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
 from sigma.processing.transformations import AddConditionTransformation, FieldMappingTransformation
 
+from sigma.pipelines.netwitness.schemas import PipelinePriority
+
 netwitness_fortinet_field_mappings: Dict[str, Union[str, List[str]]] = {
     "DestinationPort": "ip.dstport",
     "NetwitnessDirection": "direction",
@@ -83,7 +85,7 @@ logsource_transformation_mappings: List[Tuple[str, LogsourceCondition, Dict]] = 
 
 
 def netwitness_fortinet_pipeline() -> ProcessingPipeline:
-    """Returns the netwitness <-> fortinet process pipeline
+    """Returns the NetWitness <-> Fortinet process pipeline
 
     Returns:
         ProcessingPipeline: Fortinet processing pipeline
@@ -111,6 +113,6 @@ def netwitness_fortinet_pipeline() -> ProcessingPipeline:
     return ProcessingPipeline(
         name="NetWitness Fortinet log source conditions",
         allowed_backends=frozenset({"netwitness"}),
-        priority=2,
+        priority=PipelinePriority.FIRST.value,
         items=processing_items,
     )

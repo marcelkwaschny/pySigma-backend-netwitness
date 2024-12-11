@@ -7,6 +7,8 @@ from sigma.processing.conditions import LogsourceCondition
 from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
 from sigma.processing.transformations import AddConditionTransformation, FieldMappingTransformation
 
+from sigma.pipelines.netwitness.schemas import PipelinePriority
+
 netwitness_windows_field_mappings: Dict[str, Union[str, List[str]]] = {
     "Account": "user",
     "AgentComputer": "alias.host",
@@ -33,7 +35,7 @@ netwitness_windows_field_mappings: Dict[str, Union[str, List[str]]] = {
 
 
 def netwitness_windows_pipeline() -> ProcessingPipeline:
-    """Returns the netwitness <-> windows process pipeline
+    """Returns the NetWitness <-> Windows process pipeline
 
     Returns:
         ProcessingPipeline: Windows processing pipeline
@@ -60,6 +62,6 @@ def netwitness_windows_pipeline() -> ProcessingPipeline:
     return ProcessingPipeline(
         name="NetWitness Windows log source conditions",
         allowed_backends=frozenset({"netwitness"}),
-        priority=1,
+        priority=PipelinePriority.FIRST.value,
         items=processing_items,
     )

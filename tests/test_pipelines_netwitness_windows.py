@@ -1,4 +1,4 @@
-"""Module to test the netwitness windows processing pipeline"""
+"""Module to test the NetWitness windows processing pipeline"""
 
 import pytest
 from sigma.collection import SigmaCollection
@@ -9,7 +9,7 @@ from sigma.pipelines.netwitness.windows import netwitness_windows_pipeline
 
 @pytest.fixture(name="netwitness_backend_windows_pipeline")
 def netwitness_backend_windows_pipeline_fixture() -> NetWitnessBackend:
-    """Fixture for the netwitness backend instance with a windows processing pipeline
+    """Fixture for the NetWitness backend instance with a windows processing pipeline
 
     Returns:
         NetWitnessBackend: NetWitness backend instance
@@ -19,7 +19,7 @@ def netwitness_backend_windows_pipeline_fixture() -> NetWitnessBackend:
 
 
 def test_windows_event_id_transformation_to_string(netwitness_backend_windows_pipeline: NetWitnessBackend):
-    """Test transformation of event ids to string because this is a text field in netwitness"""
+    """Test transformation of event ids to string because this is a text field in NetWitness"""
 
     conversion_result: str = netwitness_backend_windows_pipeline.convert(
         SigmaCollection.from_yaml(  # type: ignore
