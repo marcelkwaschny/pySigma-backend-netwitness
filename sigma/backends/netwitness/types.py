@@ -1,4 +1,4 @@
-"""Custom types for the netwitness backend"""
+"""Custom types for the NetWitness backend"""
 
 from typing import Optional
 

@@ -32,12 +32,11 @@ from sigma.pipelines.netwitness.netwitness import netwitness_pipeline
 class NetWitnessBackend(TextQueryBackend):
     """NetWitness backend."""
 
-    name: ClassVar[str] = "netwitness backend"
+    name: ClassVar[str] = "NetWitness backend"
     formats: ClassVar[Dict[str, str]] = {
-        "default": "Plain netwitness queries",
+        "default": "Plain NetWitness queries",
     }
-    # Does the backend requires that a processing pipeline is provided? This information can be used by user
-    # interface programs like Sigma CLI to warn users about inappropriate usage of the backend.
+    # Does the backend require a processing pipeline?
     requires_pipeline: ClassVar[bool] = False
     default_format: ClassVar[str] = "default"
     output_format_processing_pipeline: ClassVar[Dict[str, ProcessingPipeline]] = {"default": netwitness_pipeline()}
@@ -65,14 +64,9 @@ class NetWitnessBackend(TextQueryBackend):
     # Fields
     # Quoting
 
-    # Character used to quote field characters if field_quote_pattern matches (or not, depending on
-    # field_quote_pattern_negation). No field name quoting is done if not set.
-    field_quote: ClassVar[Optional[str]] = None
-    # Quote field names if this pattern (doesn't) matches, depending on field_quote_pattern_negation.
-    # Field name is always quoted if pattern is not set.
-    field_quote_pattern: ClassVar[Optional[Pattern[str]]] = None
-    # Negate field_quote_pattern result. Field name is quoted if pattern doesn't matches if set to True (default).
-    field_quote_pattern_negation: ClassVar[bool] = True
+    field_quote: ClassVar[Optional[str]] = None  # Char used to quote field characters if field_quote_pattern matches
+    field_quote_pattern: ClassVar[Optional[Pattern[str]]] = None  # Quote field names if this pattern (doesn't) matches
+    field_quote_pattern_negation: ClassVar[bool] = True  # Field name is quoted if pattern doesn't matches when True
 
     # Values
     str_quote: ClassVar[str] = "'"  # string quoting character (added as escaping character)
@@ -375,7 +369,7 @@ class NetWitnessBackend(TextQueryBackend):
 
     def unpack_condition_if_necessary(self, cond: Union[ConditionOR, ConditionAND]) -> Union[ConditionOR, ConditionAND]:
         """This method checks if a condition needs unpacking. If the condition contains arguments with values
-        that have the SigmaExpansion type unpacking is necessary for netwitness. This will convert the SigmaExpansion
+        that have the SigmaExpansion type unpacking is necessary for NetWitness. This will convert the SigmaExpansion
         value into normal ConditionFieldEqualsValueExpression which then can be used to turn into a list. Therefore
         queries will get shorter.
 
@@ -405,7 +399,7 @@ class NetWitnessBackend(TextQueryBackend):
         self, cond: Union[ConditionOR, ConditionAND], state: ConversionState
     ) -> list[Union[str, DeferredQueryExpression]]:
         """Converts a condition into sub expressions. This is used to generate smaller expressions
-        for netwitness. Generally expressions like fieldA = 'foo' || fieldA = 'bar' can be summarized
+        for NetWitness. Generally expressions like fieldA = 'foo' || fieldA = 'bar' can be summarized
         as fieldA = 'foo','bar'. This also works for modifiers like contains, begins, ends e.g. but for
         them the standard implementation of pySigma doesn't generates lists. So this is the implementation
         for that. The implementation also supports multiple modifiers in the condition which will then

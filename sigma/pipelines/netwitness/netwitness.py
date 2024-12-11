@@ -7,6 +7,7 @@ from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
 from sigma.processing.transformations import ConvertTypeTransformation
 
 from sigma.backends.netwitness.transformations import UnquoteStringTransformation
+from sigma.pipelines.netwitness.schemas import PipelinePriority
 
 field_transformations_to_string: List[str] = [
     "OS",
@@ -252,7 +253,7 @@ field_transformations_unquote: List[str] = [
 
 
 def netwitness_pipeline() -> ProcessingPipeline:
-    """Returns the general netwitness process pipeline
+    """Returns the general NetWitness process pipeline
 
     Returns:
         ProcessingPipeline: NetWitness processing pipeline
@@ -287,6 +288,6 @@ def netwitness_pipeline() -> ProcessingPipeline:
     return ProcessingPipeline(
         name="NetWitness processing pipeline",
         allowed_backends=frozenset({"netwitness"}),
-        priority=99,
+        priority=PipelinePriority.LAST.value,
         items=processing_items,
     )

@@ -1,4 +1,4 @@
-"""Module to test the netwitness fortinet processing pipeline"""
+"""Module to test the NetWitness Fortinet processing pipeline"""
 
 import pytest
 from sigma.collection import SigmaCollection
@@ -9,7 +9,7 @@ from sigma.pipelines.netwitness.fortinet import netwitness_fortinet_pipeline
 
 @pytest.fixture(name="netwitness_backend_fortinet_pipeline")
 def netwitness_backend_fortinet_pipeline_fixture() -> NetWitnessBackend:
-    """Fixture for the netwitness backend instance with a fortinet processing pipeline
+    """Fixture for the NetWitness backend instance with a Fortinet processing pipeline
 
     Returns:
         NetWitnessBackend: NetWitness backend instance
