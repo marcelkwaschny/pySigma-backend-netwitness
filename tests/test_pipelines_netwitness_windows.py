@@ -37,7 +37,7 @@ def test_windows_event_id_transformation_to_string(netwitness_backend_windows_pi
         )
     )
 
-    assert conversion_result == ["reference.id = '4688' && param = 'test'"]
+    assert conversion_result == ["device.type = 'windows' && (reference.id = '4688' && param = 'test')"]
 
 
 def test_windows_process_creation(netwitness_backend_windows_pipeline: NetWitnessBackend):
@@ -59,7 +59,7 @@ def test_windows_process_creation(netwitness_backend_windows_pipeline: NetWitnes
         )
     )
 
-    assert conversion_result == ["reference.id = '4688' && param = 'test'"]
+    assert conversion_result == ["device.type = 'windows' && (reference.id = '4688' && param = 'test')"]
 
 
 def test_netwitness_param_contains_backslash(netwitness_backend_windows_pipeline: NetWitnessBackend):
@@ -81,4 +81,4 @@ def test_netwitness_param_contains_backslash(netwitness_backend_windows_pipeline
         )
     )
 
-    assert conversion_result == ["reference.id = '4688' && param contains 'C:\\Windows'"]
+    assert conversion_result == ["device.type = 'windows' && (reference.id = '4688' && param contains 'C:\\Windows')"]
