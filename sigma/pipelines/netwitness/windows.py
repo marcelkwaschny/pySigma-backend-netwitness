@@ -53,6 +53,14 @@ def netwitness_windows_pipeline() -> ProcessingPipeline:
 
     processing_items.append(
         ProcessingItem(
+            identifier="netwitness_windows_add_device_type_condition",
+            transformation=AddConditionTransformation({"device.type": "windows"}),
+            rule_conditions=[LogsourceCondition(product="windows")],
+        )
+    )
+
+    processing_items.append(
+        ProcessingItem(
             identifier="netwitness_windows_field_mapping",
             transformation=FieldMappingTransformation(netwitness_windows_field_mappings),
             rule_conditions=[LogsourceCondition(product="windows")],
