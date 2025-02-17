@@ -8,3 +8,4 @@
 cov.xml
 dist/
 docs/_build
+main.py
