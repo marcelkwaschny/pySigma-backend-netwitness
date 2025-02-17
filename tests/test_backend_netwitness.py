@@ -656,3 +656,30 @@ def test_equal_char_in_list_contains(netwitness_backend: NetWitnessBackend):
     )
 
     assert conversion_result == ["FieldA contains 'field1=value1','field2=value2'"]
+
+
+def test_quoting_if_quote_in_value(netwitness_backend: NetWitnessBackend):
+    """Test conversion of a rule that contains a value that contains a quoting character. If a value
+    contains a single quote then this value has to be quoted with with double quotes instead of
+    single quotes (which is the default).
+    """
+
+    conversion_result: str = netwitness_backend.convert(
+        SigmaCollection.from_yaml(
+            """
+            title: Test
+            status: test
+            logsource:
+                category: test_category
+                product: test_product
+            detection:
+                selection:
+                    FieldA|contains|all:
+                        - C:\\WINDOWS
+                        - .exe',
+                condition: selection
+            """
+        )
+    )
+
+    assert conversion_result == ["FieldA contains 'C:\\WINDOWS' && FieldA contains \".exe',\""]

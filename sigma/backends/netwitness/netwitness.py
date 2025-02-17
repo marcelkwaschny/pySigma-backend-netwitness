@@ -202,6 +202,16 @@ class NetWitnessBackend(TextQueryBackend):
 
         return super().decide_string_quoting(s)
 
+    def quote_string(self, s: str) -> str:
+        """Put quotes around string."""
+
+        if "\\'" in s:
+            transformed_string = s.replace("\\'", "'")
+            transformed_string = '"' + transformed_string + '"'
+            return transformed_string
+
+        return super().quote_string(s)
+
     def convert_condition_not(self, cond: ConditionNOT, state: ConversionState) -> Union[str, DeferredQueryExpression]:
         """Conversion of NOT conditions
 
