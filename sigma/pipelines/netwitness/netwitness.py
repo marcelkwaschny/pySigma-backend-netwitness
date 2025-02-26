@@ -4,9 +4,8 @@ from typing import List
 
 from sigma.processing.conditions import IncludeFieldCondition
 from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
-from sigma.processing.transformations import ConvertTypeTransformation
 
-from sigma.backends.netwitness.transformations import UnquoteStringTransformation
+from sigma.backends.netwitness.transformations import CustomConvertTypeTransformation, UnquoteStringTransformation
 from sigma.pipelines.netwitness.schemas import PipelinePriority
 
 field_transformations_to_string: List[str] = [
@@ -264,7 +263,7 @@ def netwitness_pipeline() -> ProcessingPipeline:
     processing_items.append(
         ProcessingItem(
             identifier="netwitness_transform_fields_to_string",
-            transformation=ConvertTypeTransformation(target_type="str"),
+            transformation=CustomConvertTypeTransformation(target_type="str"),
             field_name_conditions=[IncludeFieldCondition(fields=field_transformations_to_string)],
         )
     )
@@ -272,7 +271,7 @@ def netwitness_pipeline() -> ProcessingPipeline:
     processing_items.append(
         ProcessingItem(
             identifier="netwitness_transform_fields_to_number",
-            transformation=ConvertTypeTransformation(target_type="num"),
+            transformation=CustomConvertTypeTransformation(target_type="num"),
             field_name_conditions=[IncludeFieldCondition(fields=field_transformations_to_number)],
         )
     )

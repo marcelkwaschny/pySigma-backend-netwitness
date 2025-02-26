@@ -82,3 +82,28 @@ def test_netwitness_param_contains_backslash(netwitness_backend_windows_pipeline
     )
 
     assert conversion_result == ["device.type = 'windows' && (reference.id = '4688' && param contains 'C:\\Windows')"]
+
+
+def test_windows_with_windash_modifier(netwitness_backend_windows_pipeline: NetWitnessBackend):
+    """Test basic field mapping and injection of the process creation condition"""
+
+    conversion_result: str = netwitness_backend_windows_pipeline.convert(
+        SigmaCollection.from_yaml(  # type: ignore
+            """
+            title: Test
+            status: test
+            logsource:
+                product: windows
+                category: process_creation
+            detection:
+                sel:
+                    CommandLine|windash|contains:
+                    - '-f'
+                condition: sel
+            """
+        )
+    )
+
+    assert conversion_result == [
+        "device.type = 'windows' && (reference.id = '4688' && (param contains '-f','/f','–f','—f','―f'))"
+    ]
