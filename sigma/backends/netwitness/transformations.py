@@ -31,26 +31,21 @@ class CustomConvertTypeTransformation(ValueTransformation):
     def apply_value(self, field: str, val: SigmaType) -> Union[SigmaString, SigmaNumber, SigmaExpansion]:
         if self.target_type == "str":
             if isinstance(val, SigmaExpansion):
-                for entry in val.values:
-                    entry = SigmaString(str(entry))
+                for i, entry in enumerate(val.values):
+                    val.values[i] = SigmaString(str(entry))
+
                 return val
+
             return SigmaString(str(val))
         if self.target_type == "num":
             try:
                 if isinstance(val, SigmaExpansion):
-                    for entry in val.values:
-                        float_value = float(str(entry))
-                        if float_value.is_integer():
-                            entry = SigmaNumber(int(str(entry)))
-                        else:
-                            entry = SigmaNumber(float(str(entry)))
+                    for i, entry in enumerate(val.values):
+                        val.values[i] = SigmaNumber(str(entry))  # type: ignore[arg-type]
+
                     return val
 
-                float_value = float(str(val))
-                if float_value.is_integer():
-                    return SigmaNumber(int(str(val)))
-
-                return SigmaNumber(float_value)
+                return SigmaNumber(str(val))  # type: ignore[arg-type]
             except SigmaValueError as error:
                 raise SigmaValueError(f"Value '{val}' can't be converted to number for {str(self)}") from error
 
