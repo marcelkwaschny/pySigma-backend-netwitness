@@ -35,11 +35,10 @@ class CustomConvertTypeTransformation(ValueTransformation):
                     val.values[i] = SigmaString(str(entry))
 
                 return val
+            if isinstance(val, SigmaNumber):
+                val = SigmaString(str(val))
 
-            if not isinstance(val, SigmaNumber):
-                return val
-
-            return SigmaString(str(val))
+            return val
         if self.target_type == "num":
             try:
                 if isinstance(val, SigmaExpansion):
@@ -47,11 +46,10 @@ class CustomConvertTypeTransformation(ValueTransformation):
                         val.values[i] = SigmaNumber(str(entry))  # type: ignore[arg-type]
 
                     return val
+                if isinstance(val, SigmaString):
+                    val = SigmaNumber(str(val))  # type: ignore[arg-type]
 
-                if not isinstance(val, SigmaString):
-                    return val
-
-                return SigmaNumber(str(val))  # type: ignore[arg-type]
+                return val
             except SigmaValueError as error:
                 raise SigmaValueError(f"Value '{val}' can't be converted to number for {str(self)}") from error
 
