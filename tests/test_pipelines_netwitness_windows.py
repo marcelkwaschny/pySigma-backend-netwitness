@@ -107,3 +107,52 @@ def test_windows_with_windash_modifier(netwitness_backend_windows_pipeline: NetW
     assert conversion_result == [
         "device.type = 'windows' && (reference.id = '4688' && (param contains '-f','/f','–f','—f','―f'))"
     ]
+
+
+def test_windows_with_contains_modifier_with_ending_escape_char(netwitness_backend_windows_pipeline: NetWitnessBackend):
+    """Test if rule which has a field that ends with the escape char is converted correctly"""
+
+    conversion_result: str = netwitness_backend_windows_pipeline.convert(
+        SigmaCollection.from_yaml(  # type: ignore
+            """
+            title: Test
+            status: test
+            logsource:
+                product: windows
+                service: security
+            detection:
+                sel:
+                    NewProcessName|contains:
+                    - C:\\Windows\\Temp\\
+                condition: sel
+            """
+        )
+    )
+
+    assert conversion_result == ["device.type = 'windows' && process contains 'C:\\Windows\\Temp\\'"]
+
+
+def test_field_in_filter_with_null_value(netwitness_backend_windows_pipeline: NetWitnessBackend):
+    """Test if the rule is converted correctly if a null value check in a filter is used"""
+
+    conversion_result: str = netwitness_backend_windows_pipeline.convert(
+        SigmaCollection.from_yaml(
+            """
+            title: Test
+            status: test
+            logsource:
+                category: process_creation
+                product: windows
+            detection:
+                selection:
+                    Field: Test
+                filter:
+                    CommandLine: null
+                condition: selection and not filter
+            """
+        )
+    )
+
+    assert conversion_result == [
+        "device.type = 'windows' && (reference.id = '4688' && (Field = 'Test' && (NOT (param !exists || param = '-'))))"
+    ]

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pySigma-backend-netwitness"
-version = "0.2.4"
+version = "0.2.5"
 description = "pySigma NetWitness backend"
 readme = "README.md"
 authors = ["Marcel Kwaschny <dev@marcelkwaschny.de>"]
@@ -11,8 +11,8 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-pysigma = "^0.11.9"
+python = ">=3.9,<4.0"
+pysigma = ">=0.11.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
@@ -42,7 +42,7 @@ max-line-length=120
 
 [tool.pylint.'MESSAGES CONTROL']
 enable="all"
-disable="too-few-public-methods,suppressed-message,locally-disabled,too-many-arguments,fixme,no-name-in-module"
+disable="too-few-public-methods,suppressed-message,locally-disabled,too-many-arguments,fixme,no-name-in-module,too-many-return-statements"
 
 [tool.black]
 line-length = 120

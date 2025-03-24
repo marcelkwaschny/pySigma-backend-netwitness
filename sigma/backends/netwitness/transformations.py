@@ -1,7 +1,7 @@
 """Custom transformations for the NetWitness backend"""
 
 from dataclasses import dataclass
-from typing import Literal, Optional, Union
+from typing import Literal, Optional
 
 from sigma.exceptions import SigmaValueError
 from sigma.processing.transformations import StringValueTransformation, ValueTransformation
@@ -28,12 +28,15 @@ class CustomConvertTypeTransformation(ValueTransformation):
 
     target_type: Literal["str", "num"]
 
-    def apply_value(self, field: str, val: SigmaType) -> Union[SigmaString, SigmaNumber, SigmaExpansion]:
+    def apply_value(self, field: str, val: SigmaType) -> SigmaType:
         if self.target_type == "str":
             if isinstance(val, SigmaExpansion):
                 for i, entry in enumerate(val.values):
                     val.values[i] = SigmaString(str(entry))
 
+                return val
+
+            if not isinstance(val, SigmaNumber):
                 return val
 
             return SigmaString(str(val))
@@ -43,6 +46,9 @@ class CustomConvertTypeTransformation(ValueTransformation):
                     for i, entry in enumerate(val.values):
                         val.values[i] = SigmaNumber(str(entry))  # type: ignore[arg-type]
 
+                    return val
+
+                if not isinstance(val, SigmaString):
                     return val
 
                 return SigmaNumber(str(val))  # type: ignore[arg-type]
