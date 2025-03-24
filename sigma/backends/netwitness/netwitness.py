@@ -72,7 +72,7 @@ class NetWitnessBackend(TextQueryBackend):
     str_quote: ClassVar[str] = "'"  # string quoting character (added as escaping character)
     str_quote_pattern: ClassVar[Optional[Pattern[str]]] = None  # re.compile("^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
     str_quote_pattern_negation: ClassVar[bool] = True
-    escape_char: ClassVar[Optional[str]] = "\\"  # Escaping character for special characrers inside string
+    escape_char: ClassVar[Optional[str]] = "\\"  # Escaping character for special characters inside string
     wildcard_multi: ClassVar[Optional[str]] = ""  # Character used as multi-character wildcard
     wildcard_single: ClassVar[Optional[str]] = ""  # Character used as single-character wildcard
     add_escaped: ClassVar[str] = ""  # Characters quoted in addition to wildcards and string quote
