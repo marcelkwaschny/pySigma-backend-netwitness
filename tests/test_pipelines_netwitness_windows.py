@@ -15,14 +15,14 @@ def netwitness_backend_windows_pipeline_fixture() -> NetWitnessBackend:
         NetWitnessBackend: NetWitness backend instance
     """
 
-    return NetWitnessBackend(processing_pipeline=netwitness_windows_pipeline())
+    return NetWitnessBackend(processing_pipeline=netwitness_windows_pipeline())  # type: ignore[arg-type]
 
 
-def test_windows_event_id_transformation_to_string(netwitness_backend_windows_pipeline: NetWitnessBackend):
+def test_windows_event_id_transformation_to_string(netwitness_backend_windows_pipeline: NetWitnessBackend) -> None:
     """Test transformation of event ids to string because this is a text field in NetWitness"""
 
     conversion_result: str = netwitness_backend_windows_pipeline.convert(
-        SigmaCollection.from_yaml(  # type: ignore
+        SigmaCollection.from_yaml(
             """
             title: Test
             status: test
@@ -40,11 +40,11 @@ def test_windows_event_id_transformation_to_string(netwitness_backend_windows_pi
     assert conversion_result == ["device.type = 'windows' && (reference.id = '4688' && param = 'test')"]
 
 
-def test_windows_process_creation(netwitness_backend_windows_pipeline: NetWitnessBackend):
+def test_windows_process_creation(netwitness_backend_windows_pipeline: NetWitnessBackend) -> None:
     """Test basic field mapping and injection of the process creation condition"""
 
     conversion_result: str = netwitness_backend_windows_pipeline.convert(
-        SigmaCollection.from_yaml(  # type: ignore
+        SigmaCollection.from_yaml(
             """
             title: Test
             status: test
@@ -62,11 +62,11 @@ def test_windows_process_creation(netwitness_backend_windows_pipeline: NetWitnes
     assert conversion_result == ["device.type = 'windows' && (reference.id = '4688' && param = 'test')"]
 
 
-def test_netwitness_param_contains_backslash(netwitness_backend_windows_pipeline: NetWitnessBackend):
+def test_netwitness_param_contains_backslash(netwitness_backend_windows_pipeline: NetWitnessBackend) -> None:
     """Test basic field mapping and injection of the process creation condition"""
 
     conversion_result: str = netwitness_backend_windows_pipeline.convert(
-        SigmaCollection.from_yaml(  # type: ignore
+        SigmaCollection.from_yaml(
             """
             title: Test
             status: test
@@ -84,11 +84,11 @@ def test_netwitness_param_contains_backslash(netwitness_backend_windows_pipeline
     assert conversion_result == ["device.type = 'windows' && (reference.id = '4688' && param contains 'C:\\Windows')"]
 
 
-def test_windows_with_windash_modifier(netwitness_backend_windows_pipeline: NetWitnessBackend):
+def test_windows_with_windash_modifier(netwitness_backend_windows_pipeline: NetWitnessBackend) -> None:
     """Test basic field mapping and injection of the process creation condition"""
 
     conversion_result: str = netwitness_backend_windows_pipeline.convert(
-        SigmaCollection.from_yaml(  # type: ignore
+        SigmaCollection.from_yaml(
             """
             title: Test
             status: test
@@ -109,11 +109,13 @@ def test_windows_with_windash_modifier(netwitness_backend_windows_pipeline: NetW
     ]
 
 
-def test_windows_with_contains_modifier_with_ending_escape_char(netwitness_backend_windows_pipeline: NetWitnessBackend):
+def test_windows_with_contains_modifier_with_ending_escape_char(
+    netwitness_backend_windows_pipeline: NetWitnessBackend,
+) -> None:
     """Test if rule which has a field that ends with the escape char is converted correctly"""
 
     conversion_result: str = netwitness_backend_windows_pipeline.convert(
-        SigmaCollection.from_yaml(  # type: ignore
+        SigmaCollection.from_yaml(
             """
             title: Test
             status: test
@@ -132,7 +134,7 @@ def test_windows_with_contains_modifier_with_ending_escape_char(netwitness_backe
     assert conversion_result == ["device.type = 'windows' && process contains 'C:\\Windows\\Temp\\'"]
 
 
-def test_field_in_filter_with_null_value(netwitness_backend_windows_pipeline: NetWitnessBackend):
+def test_field_in_filter_with_null_value(netwitness_backend_windows_pipeline: NetWitnessBackend) -> None:
     """Test if the rule is converted correctly if a null value check in a filter is used"""
 
     conversion_result: str = netwitness_backend_windows_pipeline.convert(

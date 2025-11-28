@@ -5,6 +5,7 @@
 .venv/
 .vscode/
 **/__pycache__
+*.egg-info
 cov.xml
 dist/
 docs/_build

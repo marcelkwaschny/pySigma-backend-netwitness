@@ -10,30 +10,25 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Poetry
-        run: pipx install poetry
+      - uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: 3.9
+          python-version: 3.10
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.9.13"
       - name: Verify versioning
         run: |
-          [ "$(poetry version -s)" == "${GITHUB_REF#refs/tags/v}" ]
+          [ "$(uv version --short)" == "${GITHUB_REF#refs/tags/v}" ]
       - name: Install dependencies
-        run: poetry install
-      - name: Run tests
-        run: poetry run pytest
-      - name: Build packages
-        run: poetry build
-      - name: Configure Poetry
-        run: |
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry config pypi-token.testpypi ${{ secrets.TEST_PYPI_API_TOKEN }}
-          poetry config pypi-token.pypi "${{ secrets.PYPI_API_TOKEN }}"
+        run: uv sync --frozen
+      - name: Build package
+        run: uv build
       - name: Publish to test PyPI
         if: ${{ github.event_name == 'push' }}
-        run: poetry publish -r testpypi
+        run: uv publish --publish-url https://test.pypi.org/legacy/ --token ${{ secrets.TEST_PYPI_API_TOKEN }}
       - name: Publish to PyPI
         if: ${{ github.event_name == 'release' }}
-        run: poetry publish
+        run: uv publish --publish-url https://pypi.org/legacy/ --token ${{ secrets.PYPI_API_TOKEN }}

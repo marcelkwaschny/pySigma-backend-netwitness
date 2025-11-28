@@ -11,26 +11,28 @@ jobs:
     strategy:
       matrix:
         os: [ 'ubuntu-24.04' ]
-        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
+        python-version: [ '3.10', '3.11', '3.12', '3.13', '3.14' ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Poetry
-        run: pipx install poetry
+      - uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.9.13"
       - name: Install dependencies
-        run: poetry install
+        run: uv sync --frozen
       - name: Run tests
-        run: poetry run pytest --cov=sigma --cov-report term --cov-report xml:cov.xml -vv
+        run: uv run pytest --cov=sigma --cov-report term --cov-report xml:cov.xml -vv
       - name: Store coverage for badge
-        if: ${{ runner.os == 'Linux' }}
-        run: poetry run python print_coverage.py >> $GITHUB_ENV
+        if: ${{ matrix.python-version == '3.10' }}
+        run: uv run python print_coverage.py >> $GITHUB_ENV
       - name: Create coverage badge
-        if: ${{ github.repository == 'marcelkwaschny/pySigma-backend-netwitness' && github.event_name == 'push' && runner.os == 'Linux' }}
-        uses: schneegans/dynamic-badges-action@v1.1.0
+        if: ${{ matrix.python-version == '3.10' }}
+        uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: 67d1a922faf7921cada718e3677c5b51
