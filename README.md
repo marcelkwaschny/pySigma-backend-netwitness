@@ -11,7 +11,7 @@
     <img src="https://img.shields.io/pypi/pyversions/pySigma-backend-netwitness.svg?color=%2334D058" alt="Supported Python versions">
 </a>
 <a href="https://pypi.org/project/pySigma-backend-netwitness" target="_blank">
-    <img src="https://img.shields.io/badge/Status-pre--release-orange" alt="Release status">
+    <img src="https://img.shields.io/badge/Status-stable-green" alt="Release status">
 </a>
 
 # pySigma NetWitness Backend
