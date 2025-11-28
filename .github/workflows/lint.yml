@@ -7,78 +7,65 @@ on:
   workflow_dispatch:
 
 jobs:
-  pylint:
+  formatting:
     strategy:
       matrix:
         os: [ 'ubuntu-24.04' ]
-        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
+        python-version: [ '3.10', '3.11', '3.12', '3.13', '3.14' ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Poetry
-        run: pipx install poetry
+      - uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: poetry install
-      - name: Run pylint
-        run: poetry run pylint sigma tests
-
-  flake8:
-    strategy:
-      matrix:
-        os: [ 'ubuntu-24.04' ]
-        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Poetry
-        run: pipx install poetry
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: ${{ matrix.python-version }}
+          version: "0.9.13"
       - name: Install dependencies
-        run: poetry install
-      - name: Run flake8
-        run: poetry run pflake8 sigma tests
+        run: uv sync --frozen
+      - name: Run ruff
+        run: uv run ruff format --check sigma tests
 
   ruff:
     strategy:
       matrix:
         os: [ 'ubuntu-24.04' ]
-        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
+        python-version: [ '3.10', '3.11', '3.12', '3.13', '3.14' ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Poetry
-        run: pipx install poetry
+      - uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.9.13"
       - name: Install dependencies
-        run: poetry install
+        run: uv sync --frozen
       - name: Run ruff
-        run: poetry run ruff check sigma tests
+        run: uv run ruff check sigma tests
 
   mypy:
     strategy:
       matrix:
         os: [ 'ubuntu-24.04' ]
-        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13' ]
+        python-version: [ '3.10', '3.11', '3.12', '3.13', '3.14' ]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Poetry
-        run: pipx install poetry
+      - uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.9.13"
       - name: Install dependencies
-        run: poetry install
+        run: uv sync --frozen
       - name: Run mypy
-        run: poetry run mypy sigma tests --explicit-package-bases
+        run: uv run mypy sigma tests

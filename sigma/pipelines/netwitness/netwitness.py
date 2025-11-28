@@ -1,14 +1,12 @@
 """Module for pySigma NetWitness processing pipelines"""
 
-from typing import List
-
 from sigma.processing.conditions import IncludeFieldCondition
 from sigma.processing.pipeline import ProcessingItem, ProcessingPipeline
 
 from sigma.backends.netwitness.transformations import CustomConvertTypeTransformation, UnquoteStringTransformation
 from sigma.pipelines.netwitness.schemas import PipelinePriority
 
-field_transformations_to_string: List[str] = [
+field_transformations_to_string: list[str] = [
     "OS",
     "access.list",
     "access.mask",
@@ -195,7 +193,7 @@ field_transformations_to_string: List[str] = [
     "web.domain",
 ]
 
-field_transformations_to_number: List[str] = [
+field_transformations_to_number: list[str] = [
     "bytes",
     "bytes.src",
     "duration.time",
@@ -231,7 +229,7 @@ field_transformations_to_number: List[str] = [
     "tcp.flags",
 ]
 
-field_transformations_unquote: List[str] = [
+field_transformations_unquote: list[str] = [
     "alias.ip",
     "alias.ipv6",
     "device.ip",

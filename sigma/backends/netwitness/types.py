@@ -1,7 +1,5 @@
 """Custom types for the NetWitness backend"""
 
-from typing import Optional
-
 from sigma.types import SigmaString
 
 
@@ -10,6 +8,13 @@ class SigmaNetWitnessString(SigmaString):
 
     quote: bool
 
-    def __init__(self, s: Optional[str] = None, quote: bool = True):
+    def __init__(self, s: str | None = None, quote: bool = True) -> None:  # noqa: FBT001, FBT002
+        """Instantiates a new sigma netwitness string
+
+        Args:
+            s (str | None, optional): String. Defaults to None.
+            quote (bool, optional): If the string should be quoted. Defaults to True.
+        """
+
         super().__init__(s)
         self.quote = quote

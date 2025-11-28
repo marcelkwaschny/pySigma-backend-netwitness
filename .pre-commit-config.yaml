@@ -1,37 +1,19 @@
 repos:
   - repo: local
     hooks:
-      - id: black
-        name: black
-        entry: black
+      - id: ruff
+        name: ruff format
+        entry: ruff format
+        fail_fast: true
         language: system
         types: [python]
       - id: ruff
-        name: ruff
+        name: ruff check
         entry: ruff check
-        language: system
-        types: [python]
-      - id: isort
-        name: isort
-        entry: isort
-        language: system
-        types: [python]
-      - id: flake8
-        name: flake8
-        entry: pflake8
         language: system
         types: [python]
       - id: mypy
         name: mypy
-        entry: mypy --explicit-package-bases 
+        entry: mypy
         language: system
         types: [python]
-      - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [python]
-        args: [
-          "-rn", # Only display messages
-          "-sn", # Don't display the score
-        ]

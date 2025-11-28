@@ -1,52 +1,44 @@
-[tool.poetry]
+[project]
 name = "pySigma-backend-netwitness"
 version = "0.2.5"
 description = "pySigma NetWitness backend"
 readme = "README.md"
-authors = ["Marcel Kwaschny <dev@marcelkwaschny.de>"]
+authors = [
+    {name = "Marcel Kwaschny", email = "dev@marcelkwaschny.de"}
+]
 license = "LGPL-2.1-only"
-repository = "https://github.com/marcelkwaschny/pySigma-backend-netwitness"
-packages = [
-    { include = "sigma" }
+requires-python = ">=3.10"
+dependencies = [
+    "pysigma>=0.11.0"
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.9,<4.0"
-pysigma = ">=0.11.0"
+[project.urls]
+repository = "https://github.com/marcelkwaschny/pySigma-backend-netwitness"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-pytest-cov = "^6.0.0"
-coverage = "^7.6.9"
-pylint = "^3.3.2"
-black = "^24.10.0"
-isort = "^5.13.2"
-pre-commit = "^4.0.1"
-pyproject-flake8 = "^7.0.0"
-ruff = "^0.8.2"
-defusedxml = "^0.7.1"
-mypy = "^1.13.0"
+[dependency-groups]
+dev = [
+    "defusedxml==0.7.1",
+    "mypy==1.18.2",
+    "pre-commit==4.3.0",
+    "pytest-cov==7.0.0",
+    "pytest==8.4.2",
+    "ruff==0.14.3",
+]
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.flake8]
-max-line-length = 120
-
-[tool.pylint.'MASTER']
-init-hook = "import sys; sys.path.append('.')"
-
-[tool.pylint.'FORMAT']
-max-line-length=120
-
-[tool.pylint.'MESSAGES CONTROL']
-enable="all"
-disable="too-few-public-methods,suppressed-message,locally-disabled,too-many-arguments,fixme,no-name-in-module"
-
-[tool.black]
+[tool.ruff]
 line-length = 120
+exclude = [".venv", "venv", "print_coverage.py"]
 
-[tool.isort]
-profile = "black"
-line_length = 120
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["COM812", "D104", "D202", "D203", "D205", "D213", "D400", "D401", "D404", "D413", "D415", "RUF001", "S105"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/**/*.py" = [
+    "S101", # asserts allowed in tests
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+check_untyped_defs = true
+explicit_package_bases = true
