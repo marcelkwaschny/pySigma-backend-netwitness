@@ -1,9 +1,11 @@
 """Module for the pySigma NetWitness backend"""
 
 from collections import defaultdict
+from importlib.metadata import version
 from re import Pattern
 from typing import ClassVar
 
+from packaging.version import Version
 from sigma.conditions import (
     ConditionAND,
     ConditionFieldEqualsValueExpression,
@@ -19,7 +21,6 @@ from sigma.conversion.state import ConversionState
 from sigma.exceptions import SigmaBackendError
 from sigma.processing.pipeline import ProcessingPipeline
 from sigma.types import (
-    CompareOperators,
     SigmaExpansion,
     SigmaNumber,
     SigmaRegularExpressionFlag,
@@ -130,13 +131,27 @@ class NetWitnessBackend(TextQueryBackend):
     # Numeric comparison operators
     # Compare operation query as format string with placeholders {field}, {operator} and {value}
     compare_op_expression: ClassVar[str | None] = "{field} {operator} {value}"
-    # Mapping between CompareOperators elements and strings used as replacement for {operator} in compare_op_expression
-    compare_operators: ClassVar[dict[CompareOperators, str] | None] = {
-        CompareOperators.LT: "<",
-        CompareOperators.LTE: "<=",
-        CompareOperators.GT: ">",
-        CompareOperators.GTE: ">=",
-    }
+
+    if Version(version("pysigma")) >= Version("1.0.0"):
+        from sigma.types import CompareOperators  # type: ignore[no-redef,attr-defined]  # noqa: PLC0415
+
+        # Mapping between CompareOperators and strings used as replacement for {operator} in compare_op_expression
+        compare_operators: ClassVar[dict[CompareOperators, str] | None] = {
+            CompareOperators.LT: "<",
+            CompareOperators.LTE: "<=",
+            CompareOperators.GT: ">",
+            CompareOperators.GTE: ">=",
+        }
+    else:
+        from sigma.types import SigmaCompareExpression  # type: ignore[no-redef,attr-defined]  # noqa: PLC0415
+
+        # Mapping between CompareOperators and strings used as replacement for {operator} in compare_op_expression
+        compare_operators: ClassVar[dict[SigmaCompareExpression.CompareOperators, str] | None] = {  # type: ignore[no-redef]
+            SigmaCompareExpression.CompareOperators.LT: "<",
+            SigmaCompareExpression.CompareOperators.LTE: "<=",
+            SigmaCompareExpression.CompareOperators.GT: ">",
+            SigmaCompareExpression.CompareOperators.GTE: ">=",
+        }
 
     # Expression for comparing two event fields
     # Field comparison expression with the placeholders {field1} and {field2} corresponding to left
@@ -246,14 +261,14 @@ class NetWitnessBackend(TextQueryBackend):
 
         try:
             if arg.__class__ in self.precedence:  # group if AND or OR condition is negated
-                group_expression = self.convert_condition_group(arg, state)
+                group_expression = self.convert_condition_group(arg, state)  # type: ignore[arg-type]
 
                 if isinstance(group_expression, DeferredQueryExpression):
                     return group_expression.negate()
 
                 return self.not_token + self.token_separator + group_expression
 
-            expr = self.convert_condition(arg, state)
+            expr = self.convert_condition(arg, state)  # type: ignore[arg-type]
             if isinstance(expr, DeferredQueryExpression):  # negate deferred expression and pass it to parent
                 return expr.negate()
 
@@ -489,7 +504,8 @@ class NetWitnessBackend(TextQueryBackend):
                 NetWitnessBackend.or_in_operator = modifier
 
             sub_expression: str | DeferredQueryExpression = super().convert_condition_as_in_expression(
-                cond=ConditionOR(args=args), state=state
+                cond=ConditionOR(args=args),  # type: ignore[arg-type]
+                state=state,
             )
 
             if modifier != "or":

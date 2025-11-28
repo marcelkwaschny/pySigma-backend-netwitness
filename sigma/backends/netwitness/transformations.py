@@ -11,7 +11,10 @@ from sigma.types import SigmaExpansion, SigmaNumber, SigmaString, SigmaType
 from sigma.backends.netwitness.types import SigmaNetWitnessString
 
 if Version(version("pysigma")) >= Version("1.0.0"):
-    from sigma.processing.transformations.base import StringValueTransformation, ValueTransformation
+    from sigma.processing.transformations.base import (  # type: ignore[no-redef,attr-defined]
+        StringValueTransformation,
+        ValueTransformation,
+    )
 else:
     from sigma.processing.transformations import (  # type: ignore[no-redef,attr-defined]
         StringValueTransformation,

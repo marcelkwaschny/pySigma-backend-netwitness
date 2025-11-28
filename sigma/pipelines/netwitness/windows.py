@@ -62,7 +62,7 @@ def netwitness_windows_pipeline() -> ProcessingPipeline:
     processing_items.append(
         ProcessingItem(
             identifier="netwitness_windows_field_mapping",
-            transformation=FieldMappingTransformation(netwitness_windows_field_mappings),
+            transformation=FieldMappingTransformation(netwitness_windows_field_mappings),  # type: ignore[arg-type]
             rule_conditions=[LogsourceCondition(product="windows")],
         )
     )
