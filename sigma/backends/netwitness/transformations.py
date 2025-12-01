@@ -37,7 +37,7 @@ class UnquoteStringTransformation(StringValueTransformation):
             val (SigmaString): Value
 
         Returns:
-            SigmaString | None: _description_
+            SigmaString | None: Transformed value
         """
 
         return SigmaNetWitnessString(s=val.original, quote=False)
@@ -45,7 +45,7 @@ class UnquoteStringTransformation(StringValueTransformation):
 
 @dataclass
 class CustomConvertTypeTransformation(ValueTransformation):
-    """Convert type of value. The conversion into strings and numbers is currently supported."""
+    """Custom type converter class. Conversion into strings and numbers is currently supported."""
 
     target_type: Literal["str", "num"]
 
