@@ -26,6 +26,9 @@ jobs:
         run: uv sync --frozen
       - name: Build package
         run: uv build
+      - name: Publish to test PyPI
+        if: ${{ github.event_name == 'push' }}
+        run: uv publish --publish-url https://test.pypi.org/legacy/ --token ${{ secrets.TEST_PYPI_API_TOKEN }}
       - name: Publish to PyPI
         if: ${{ github.event_name == 'release' }}
         run: uv publish --publish-url https://pypi.org/legacy/ --token ${{ secrets.PYPI_API_TOKEN }}
