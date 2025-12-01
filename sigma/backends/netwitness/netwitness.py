@@ -212,10 +212,10 @@ class NetWitnessBackend(TextQueryBackend):
     deferred_only_query: ClassVar[str] = "*"  # String used as query if final query only contains deferred expression
 
     def decide_string_quoting(self, s: SigmaString | SigmaNetWitnessString) -> bool:
-        """Special handling for string quoting if the value is a netwitness string
+        """Handling of string quoting for either common sigma strings or NetWitness strings
 
         Args:
-            s (SigmaString | SigmaNetWitnessString): Normal sigma string or special netwitness string instance
+            s (SigmaString | SigmaNetWitnessString): Common sigma string or custom netwitness string instance
 
         Returns:
             bool: True if string should be quoted, False otherwise
@@ -313,7 +313,7 @@ class NetWitnessBackend(TextQueryBackend):
         cond: ConditionOR | ConditionAND,
         state: ConversionState,  # noqa: ARG002
     ) -> bool:
-        """Decide if an OR or AND expression should be converted as "field in (value list)" or as plain expression.
+        """Decide whether an OR or AND expression should be converted as "field in (value list)" or as plain expression.
 
         Args:
             cond (Union[ConditionOR, ConditionAND]): Condition that is converted for which the decision has to be made
@@ -359,7 +359,7 @@ class NetWitnessBackend(TextQueryBackend):
         return True
 
     def is_contains(self, arg: ConditionFieldEqualsValueExpression | ConditionValueExpression) -> bool:
-        """Checks if an given argument is a contains expression
+        """Checks whether the passed argument is a 'contains' condition or not
 
         Args:
             arg (Union[ConditionFieldEqualsValueExpression, ConditionValueExpression]): Argument to check
@@ -376,7 +376,7 @@ class NetWitnessBackend(TextQueryBackend):
         )
 
     def is_begins(self, arg: ConditionFieldEqualsValueExpression | ConditionValueExpression) -> bool:
-        """Checks if an given argument is a begins expression
+        """Checks whether the passed argument is a 'begins' condition or not
 
         Args:
             arg (Union[ConditionFieldEqualsValueExpression, ConditionValueExpression]): Argument to check
@@ -390,7 +390,7 @@ class NetWitnessBackend(TextQueryBackend):
         )
 
     def is_ends(self, arg: ConditionFieldEqualsValueExpression | ConditionValueExpression) -> bool:
-        """Checks if an given argument is an ends expression
+        """Checks whether the passed argument is an 'ends' condition or not
 
         Args:
             arg (Union[ConditionFieldEqualsValueExpression, ConditionValueExpression]): Argument to check
